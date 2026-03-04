@@ -53,3 +53,41 @@ def head_to_head(
     if result["total_matches"] == 0:
         raise HTTPException(status_code=404, detail="No matches found between these teams")
     return result
+
+
+from app.ml.predictor import predict_match, train_model
+from app.services.auth import get_admin_user
+from app.models.models import User
+
+
+@router.post("/train-model")
+def train(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Train the ML prediction model on all historical match data.
+    Admin only - this is computationally expensive.
+    """
+    result = train_model(db)
+    return result
+
+
+@router.get("/predict")
+def predict(
+    home_team_id: int = Query(..., description="Home team ID"),
+    away_team_id: int = Query(..., description="Away team ID"),
+    db: Session = Depends(get_db)
+):
+    """
+    Predict match outcome using Random Forest ML model.
+    Returns win/draw/loss probabilities for both teams.
+    If model hasn't been trained yet, returns statistical priors.
+    """
+    if home_team_id == away_team_id:
+        raise HTTPException(status_code=400, detail="Teams must be different")
+
+    result = predict_match(db, home_team_id, away_team_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="One or both teams not found")
+    return result
