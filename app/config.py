@@ -3,17 +3,16 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    secret_key: str = "dev-secret-key-change-this-in-production"
+    secret_key: str = "your-secret-key-change-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
-    database_url: str = "sqlite:///./footballiq.db"
+    database_url: str = "sqlite:////Users/tahzim/footballIQ_Engine/footballiq.db"
     football_api_key: str = ""
-    football_api_base: str = "https://api.football-data.org/v4"
+    football_api_base: str = ""
 
-    class Config:
-        env_file = ".env"
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
 
 @lru_cache()
-def get_settings() -> Settings:
+def get_settings():
     return Settings()

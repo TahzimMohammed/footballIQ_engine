@@ -6,7 +6,7 @@ from app.graphql_schema import graphql_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="FootballIQ API",
+    title="FootballIQ_Engine API",
     description="Football performance and analytics API",
     version="1.0.0"
 )

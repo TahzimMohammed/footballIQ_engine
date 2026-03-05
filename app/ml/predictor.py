@@ -1,13 +1,3 @@
-"""
-Match outcome predictor using Random Forest.
-
-The model predicts one of three outcomes:
-  0 = Away win
-  1 = Draw  
-  2 = Home win
-
-Features are engineered from each team's recent form.
-"""
 import pickle
 import os
 import numpy as np
@@ -19,10 +9,6 @@ MODEL_PATH = "app/ml/model.pkl"
 
 
 def get_team_features(db: Session, team_id: int, n: int = 10) -> dict:
-    """
-    Compute form features for a team based on their last N matches.
-    These become the input features for the ML model.
-    """
     matches = db.query(Match).filter(
         Match.status == "FINISHED",
         or_(
@@ -32,7 +18,6 @@ def get_team_features(db: Session, team_id: int, n: int = 10) -> dict:
     ).order_by(Match.match_date.desc()).limit(n).all()
 
     if not matches:
-        # Return neutral features if no history
         return {"points_per_game": 1.0, "goal_diff_rate": 0.0, "win_rate": 0.33}
 
     total_points = 0
@@ -61,34 +46,24 @@ def get_team_features(db: Session, team_id: int, n: int = 10) -> dict:
 
 
 def build_training_data(db: Session):
-    """
-    Build the training dataset from historical matches.
-    
-    Each row = one match
-    Features = home team form stats + away team form stats + home advantage
-    Label = match outcome (0=away win, 1=draw, 2=home win)
-    """
     matches = db.query(Match).filter(
         Match.status == "FINISHED",
         Match.home_goals != None,
         Match.away_goals != None
     ).order_by(Match.match_date.asc()).all()
 
-    X = []  # Features
-    y = []  # Labels
+    X = []
+    y = []
 
     print(f"Building training data from {len(matches)} matches...")
 
     for i, match in enumerate(matches):
-        # Only use matches after index 50 so teams have some history
         if i < 50:
             continue
 
-        # Get form BEFORE this match (don't include the match itself)
         home_features = get_team_features(db, match.home_team_id)
         away_features = get_team_features(db, match.away_team_id)
 
-        # Build feature vector
         features = [
             home_features["points_per_game"],
             home_features["goal_diff_rate"],
@@ -96,10 +71,9 @@ def build_training_data(db: Session):
             away_features["points_per_game"],
             away_features["goal_diff_rate"],
             away_features["win_rate"],
-            1.0  # Home advantage constant
+            1.0
         ]
 
-        # Determine outcome label
         hg = match.home_goals
         ag = match.away_goals
         if hg > ag:
@@ -116,10 +90,6 @@ def build_training_data(db: Session):
 
 
 def train_model(db: Session) -> dict:
-    """
-    Train the Random Forest model and save it to disk.
-    Returns training statistics.
-    """
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
@@ -131,15 +101,10 @@ def train_model(db: Session) -> dict:
 
     print(f"Training on {len(X)} samples...")
 
-    # Split into training and test sets (80/20 split)
-    # random_state=42 makes results reproducible
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
-    # Train the model
-    # n_estimators=100 means 100 decision trees
-    # random_state=42 for reproducibility
     model = RandomForestClassifier(
         n_estimators=100,
         random_state=42,
@@ -148,15 +113,14 @@ def train_model(db: Session) -> dict:
     )
     model.fit(X_train, y_train)
 
-    # Evaluate on test set
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
-    # Save model to disk so we don't retrain every time
     with open(MODEL_PATH, "wb") as f:
         pickle.dump(model, f)
 
     print(f"Model trained. Accuracy: {accuracy:.3f}")
+    print(f"Classes: {model.classes_}")
 
     return {
         "status": "trained",
@@ -168,7 +132,6 @@ def train_model(db: Session) -> dict:
 
 
 def load_model():
-    """Load the saved model from disk."""
     if not os.path.exists(MODEL_PATH):
         return None
     with open(MODEL_PATH, "rb") as f:
@@ -176,10 +139,6 @@ def load_model():
 
 
 def predict_match(db: Session, home_team_id: int, away_team_id: int) -> dict:
-    """
-    Predict the outcome of a match between two teams.
-    Returns probabilities for home win, draw, away win.
-    """
     model = load_model()
 
     home_team = db.query(Team).filter(Team.id == home_team_id).first()
@@ -198,34 +157,45 @@ def predict_match(db: Session, home_team_id: int, away_team_id: int) -> dict:
         away_features["points_per_game"],
         away_features["goal_diff_rate"],
         away_features["win_rate"],
-        1.0  # Home advantage
+        1.0
     ]])
 
     if model is None:
-        # Fallback to statistical priors if model not trained yet
-        # These are the historical averages across football leagues
-        probs = [0.28, 0.27, 0.45]
+        probs_list = [0.28, 0.27, 0.45]
         source = "statistical_prior"
     else:
-        # Get probability for each outcome from the model
-        probs = model.predict_proba(features)[0]
-        # predict_proba returns [away_win, draw, home_win] probabilities
+        raw_probs = model.predict_proba(features)[0]
+        # model.classes_ = [0, 1, 2] = [away_win, draw, home_win]
+        # Build a dict keyed by class label for safe lookup
+        class_probs = {model.classes_[i]: float(raw_probs[i]) for i in range(len(raw_probs))}
+        probs_list = [
+            class_probs.get(0, 0.0),  # away win
+            class_probs.get(1, 0.0),  # draw
+            class_probs.get(2, 0.0),  # home win
+        ]
         source = "random_forest_model"
+
+    home_win_prob = probs_list[2]
+    draw_prob = probs_list[1]
+    away_win_prob = probs_list[0]
+
+    if home_win_prob > draw_prob and home_win_prob > away_win_prob:
+        outcome = "Home Win"
+    elif draw_prob > away_win_prob:
+        outcome = "Draw"
+    else:
+        outcome = "Away Win"
 
     return {
         "home_team": home_team.name,
         "away_team": away_team.name,
         "prediction_source": source,
         "probabilities": {
-            "home_win": round(float(probs[2]), 3),
-            "draw": round(float(probs[1]), 3),
-            "away_win": round(float(probs[0]), 3)
+            "home_win": round(home_win_prob, 3),
+            "draw": round(draw_prob, 3),
+            "away_win": round(away_win_prob, 3)
         },
-        "predicted_outcome": (
-            "Home Win" if probs[2] > probs[1] and probs[2] > probs[0]
-            else "Draw" if probs[1] > probs[0]
-            else "Away Win"
-        ),
+        "predicted_outcome": outcome,
         "home_team_form": home_features,
         "away_team_form": away_features
     }
