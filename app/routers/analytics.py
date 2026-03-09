@@ -91,3 +91,33 @@ def predict(
     if not result:
         raise HTTPException(status_code=404, detail="One or both teams not found")
     return result
+
+
+from app.services.analytics import get_team_dna
+
+
+@router.get("/dna/{team_id}")
+def team_dna(
+    team_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get a team's DNA Fingerprint - their unique playing identity.
+
+    Computes 6 dimensions from full match history:
+    - attack_intensity: How aggressively they score
+    - defensive_solidity: Clean sheets and goals conceded
+    - consistency: How predictable their results are
+    - comeback_ability: Resilience when conceding
+    - home_fortress: Home vs away performance gap
+    - big_game_performance: Results vs strong opponents
+
+    Returns a style tag (Entertainers, Fortress, Machine, Warriors etc)
+    and an overall rating out of 100.
+    """
+    result = get_team_dna(db, team_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Team {team_id} not found")
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result

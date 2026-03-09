@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastmcp import FastMCP
 from app.database import SessionLocal
-from app.services.analytics import get_team_form, get_leaderboard, get_head_to_head
+from app.services.analytics import get_team_form, get_leaderboard, get_head_to_head, get_team_dna
 from app.ml.predictor import predict_match
 from app.models.models import Team, Player, Match
 
