@@ -72,50 +72,6 @@ The API follows REST conventions for CRUD operations, extends to GraphQL for com
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Clients                              │
-│   Browser (Swagger)   GraphQL IDE   Claude Desktop (MCP)    │
-└───────────┬───────────────┬─────────────────┬───────────────┘
-            │               │                 │
-            ▼               ▼                 ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     FastAPI Application                     │
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐    │
-│  │  /auth   │  │ /teams   │  │/analytics│  │  /graphql │    │
-│  │  router  │  │/players  │  │  router  │  │  endpoint │    │
-│  │          │  │/matches  │  │          │  │           │    │
-│  └──────────┘  └──────────┘  └──────────┘  └───────────┘    │
-│                                                             │
-│  ┌──────────────────┐        ┌──────────────────────────┐   │
-│  │  auth.service    │        │   analytics.service      │   │
-│  │  JWT + bcrypt    │        │   form, leaderboard,     │   │
-│  │                  │        │   H2H, DNA fingerprint   │   │
-│  └──────────────────┘        └──────────────────────────┘   │
-│                                                             │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │              ML Predictor (Random Forest)            │   │
-│  │         Trained on 20,743 matches • 49.5% acc        │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                                                             │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │          SQLAlchemy ORM • SQLite Database            │   │
-│  │    296 teams • 11,060 players • 25,979 matches       │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-            │
-            ▼
-┌─────────────────────────────────────────────────────────────┐
-│              MCP Server (FastMCP)                           │
-│         8 tools • AI assistant integration                  │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
 ## Tech Stack
 
 | Component | Technology | Version | Rationale |
