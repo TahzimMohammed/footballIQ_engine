@@ -43,7 +43,6 @@
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Dataset](#dataset)
 - [Features](#features)
