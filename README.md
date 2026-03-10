@@ -19,23 +19,24 @@
 ## 📸 Screenshots
 
 ### Swagger UI — Interactive API Documentation
-![Swagger UI](docs/images/swagger_ui.png)
+![Swagger UI](docs/images/SwaggerUI_Front_Page.png)
 > *All endpoints are self-documenting via OpenAPI 3.0. Every parameter, response schema, and status code is described inline.*
 
 ### Team DNA Fingerprint — Novel Analytics Feature
-![DNA Fingerprint Response](docs/images/dna_fingerprint.png)
+![DNA Fingerprint Response](docs/images/SwaggerUI_DNA.png)
 > *The DNA Fingerprint endpoint computes 6 playing style dimensions from a team's full match history, returning a style tag and overall rating.*
 
 ### GraphQL Playground — Nested Queries
-![GraphQL Playground](docs/images/graphql_playground.png)
+![GraphQL Playground](docs/images/Graphql.png)
 > *GraphQL allows fetching a team with all their players and recent matches in a single request, eliminating over-fetching.*
 
 ### MCP Server — AI-Native Interface
-![MCP in Claude Desktop](docs/images/mcp_claude.png)
+![MCP in Claude Desktop](docs/images/MCP_Claude1.png)
+![MCP in Claude Desktop](docs/images/MCP_Claude2.png)
 > *Claude Desktop using FootballIQ tools autonomously — searching for teams, fetching form, predicting outcomes and comparing DNA fingerprints in a single conversation.*
 
 ### ML Prediction — Live Response
-![ML Prediction](docs/images/ml_prediction.png)
+![ML Prediction](docs/images/SwaggerUI_Analytics.png)
 > *The prediction endpoint returns home win, draw and away win probabilities computed by a Random Forest trained on 20,743 historical matches.*
 
 ---
