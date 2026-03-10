@@ -9,14 +9,13 @@
 
 > A production-grade football analytics API with Machine Learning match prediction, GraphQL support, Team DNA Fingerprinting, and an AI-native Model Context Protocol (MCP) server. Built on real European football data spanning 8 seasons and 11 leagues.
 
-**🌐 Live API:** https://footballiq-engine.onrender.com  
-**📖 Interactive Docs:** https://footballiq-engine.onrender.com/docs  
-**🔮 GraphQL Playground:** https://footballiq-engine.onrender.com/graphql  
-**💻 GitHub:** https://github.com/TahzimMohammed/footballIQ_engine
+**Live API:** https://footballiq-engine.onrender.com  
+**Interactive Docs:** https://footballiq-engine.onrender.com/docs  
+**GraphQL Playground:** https://footballiq-engine.onrender.com/graphql  
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Swagger UI — Interactive API Documentation
 ![Swagger UI](docs/images/SwaggerUI_Front_Page.png)
@@ -77,41 +76,41 @@ The API follows REST conventions for CRUD operations, extends to GraphQL for com
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Clients                               │
+│                        Clients                              │
 │   Browser (Swagger)   GraphQL IDE   Claude Desktop (MCP)    │
 └───────────┬───────────────┬─────────────────┬───────────────┘
             │               │                 │
             ▼               ▼                 ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     FastAPI Application                      │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
-│  │  /auth   │  │ /teams   │  │/analytics│  │  /graphql │  │
-│  │  router  │  │/players  │  │  router  │  │  endpoint │  │
-│  │          │  │/matches  │  │          │  │           │  │
-│  └──────────┘  └──────────┘  └──────────┘  └───────────┘  │
-│                                                              │
-│  ┌──────────────────┐        ┌──────────────────────────┐  │
-│  │  auth.service    │        │   analytics.service      │  │
-│  │  JWT + bcrypt    │        │   form, leaderboard,     │  │
-│  │                  │        │   H2H, DNA fingerprint   │  │
-│  └──────────────────┘        └──────────────────────────┘  │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │              ML Predictor (Random Forest)             │  │
-│  │         Trained on 20,743 matches • 49.5% acc        │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │          SQLAlchemy ORM • SQLite Database             │  │
-│  │    296 teams • 11,060 players • 25,979 matches        │  │
-│  └──────────────────────────────────────────────────────┘  │
+│                     FastAPI Application                     │
+│                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐    │
+│  │  /auth   │  │ /teams   │  │/analytics│  │  /graphql │    │
+│  │  router  │  │/players  │  │  router  │  │  endpoint │    │
+│  │          │  │/matches  │  │          │  │           │    │
+│  └──────────┘  └──────────┘  └──────────┘  └───────────┘    │
+│                                                             │
+│  ┌──────────────────┐        ┌──────────────────────────┐   │
+│  │  auth.service    │        │   analytics.service      │   │
+│  │  JWT + bcrypt    │        │   form, leaderboard,     │   │
+│  │                  │        │   H2H, DNA fingerprint   │   │
+│  └──────────────────┘        └──────────────────────────┘   │
+│                                                             │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │              ML Predictor (Random Forest)            │   │
+│  │         Trained on 20,743 matches • 49.5% acc        │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │          SQLAlchemy ORM • SQLite Database            │   │
+│  │    296 teams • 11,060 players • 25,979 matches       │   │
+│  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
             │
             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              MCP Server (FastMCP)                            │
-│         8 tools • AI assistant integration                   │
+│              MCP Server (FastMCP)                           │
+│         8 tools • AI assistant integration                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -150,7 +149,7 @@ Player-team relationships were not directly available in the dataset. They were 
 
 ## Features
 
-### ✅ Full CRUD with JWT Authentication
+### Full CRUD with JWT Authentication
 All three core entities (Teams, Players, Matches) support complete Create, Read, Update, Delete operations. Endpoints are protected by role:
 - **Public** — all GET (read) endpoints
 - **Authenticated users** — POST and PATCH (create and update)
@@ -158,7 +157,7 @@ All three core entities (Teams, Players, Matches) support complete Create, Read,
 
 Passwords are never stored in plain text — bcrypt produces a 60-character hash. JWTs expire after 30 minutes for security.
 
-### ✅ Analytics Engine
+### Analytics Engine
 Three analytical endpoints built on top of the match data:
 
 **Team Form** — computes the last N match results for any team, returning points, goals, and a W/D/L string like "WWDLW".
@@ -167,15 +166,15 @@ Three analytical endpoints built on top of the match data:
 
 **Head to Head** — returns the complete historical record between two teams with win/draw/loss summary.
 
-### ✅ ML Match Prediction
+### ML Match Prediction
 A Random Forest classifier predicts match outcomes with 49.5% accuracy — significantly above the 33% random baseline and the 45% naive home-win baseline.
 
-### ✅ Team DNA Fingerprint *(Novel Feature — see below)*
+### Team DNA Fingerprint *(Novel Feature — see below)*
 
-### ✅ GraphQL Interface
+### GraphQL Interface
 Strawberry GraphQL mounted alongside REST, enabling nested queries that would require multiple REST calls to replicate.
 
-### ✅ MCP Server
+### MCP Server
 8 tools exposed via the Model Context Protocol — Claude Desktop can autonomously search teams, fetch analytics, and predict matches through natural language.
 
 ---
@@ -542,4 +541,4 @@ footballIQ_Engine/
 
 ---
 
-*COMP3011 Web Services Coursework — Bournemouth University*
+*COMP3011 Web Services Coursework*
