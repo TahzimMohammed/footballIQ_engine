@@ -495,5 +495,3 @@ footballIQ_Engine/
 - Framework: [FastAPI](https://fastapi.tiangolo.com)
 
 ---
-
-*COMP3011 Web Services Coursework*
