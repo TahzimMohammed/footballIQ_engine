@@ -24,4 +24,4 @@ app.include_router(graphql_router, prefix="/graphql")
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to FootballIQ API", "docs": "/docs", "graphql": "/graphql"}
+    return {"message": "Welcome to FootballIQ_Engine API", "docs": "/docs", "graphql": "/graphql"}

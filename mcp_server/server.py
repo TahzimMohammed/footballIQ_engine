@@ -198,6 +198,32 @@ def get_team_players(team_id: int) -> dict:
     finally:
         db.close()
 
+@mcp.tool()
+def get_dna_fingerprint(team_id: int) -> str:
+    """Get a team's DNA Fingerprint - their unique playing identity and style.
+    Returns 6 dimensions: attack_intensity, defensive_solidity, consistency,
+    comeback_ability, home_fortress, big_game_performance.
+    Also returns style tag (Warriors, Home Kings, Entertainers etc) and weakness."""
+    db = SessionLocal()
+    try:
+        result = get_team_dna(db, team_id)
+        if not result:
+            return f"Team {team_id} not found"
+        if "error" in result:
+            return result["error"]
+        dna = result["dna"]
+        return (
+            f"{result['team_name']} DNA Fingerprint\n"
+            f"Style: {result['style']} | Weakness: {result['weakness']} | Rating: {result['overall_rating']}/100\n"
+            f"Attack: {dna['attack_intensity']} | Defence: {dna['defensive_solidity']} | "
+            f"Consistency: {dna['consistency']}\n"
+            f"Comeback: {dna['comeback_ability']} | Home Fortress: {dna['home_fortress']} | "
+            f"Big Games: {dna['big_game_performance']}\n"
+            f"Matches analysed: {result['summary']['total_matches']}"
+        )
+    finally:
+        db.close()
+
 
 if __name__ == "__main__":
     print("Starting FootballIQ MCP Server...")
