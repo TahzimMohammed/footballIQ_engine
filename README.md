@@ -18,7 +18,7 @@
 ## Screenshots
 
 ### Swagger UI - Interactive API Documentation
-![Swagger UI](docs/FootballIQ_API_Documentation.pdf)
+![Swagger UI](docs/images/SwaggerUI_Front_Page.png)
 > *All endpoints are self-documenting via OpenAPI 3.0. Every parameter, response schema, and status code is described inline.*
 
 ### Team DNA Fingerprint — Novel Analytics Feature
